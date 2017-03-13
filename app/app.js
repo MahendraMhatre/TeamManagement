@@ -3,30 +3,16 @@
 // Declare app level module which depends on views, and components
 var app = angular.module('myApp', ['ui.calendar']);
 
-app.controller("myController", function($scope, $http) {
-    $scope.display = "Hello";
 
-    $http.get('users.json').success(function(data) {
-      $scope.users = data;
-    });
-
-  $http.get('resource_event.json').success(function(data) {
-    $scope.resource_event = data;
-  });
-
-
-
-
-});
 
 
 app.controller('CalController', function($scope, $http, $filter) {
     /* config object */
 
-    $scope.display = "Hello";
 
     $http.get('users.json').success(function(data) {
         $scope.users = data;
+
     });
 
     $http.get('resource_event.json').success(function(data) {
@@ -39,9 +25,6 @@ app.controller('CalController', function($scope, $http, $filter) {
     };
 
     var date = new Date();
-    var d = date.getDate();
-    var m = date.getMonth();
-    var y = date.getFullYear();
 
 
     /* event source that contains custom events on the scope */
@@ -89,33 +72,79 @@ app.controller('CalController', function($scope, $http, $filter) {
     };
 
     /* event sources array*/
+
+
+
+
     $scope.eventSources = [$scope.events];
+
+    $scope.user = {};
+
 
     $scope.addTask = function(selected) {
         console.log("in change");
         console.log(selected);
 
 
+        $scope.user[selected.sys_id] = {}
         $scope.events.splice(0,$scope.events.length);
         for(var i = 0; i < $scope.resource_event.result.length ; i++) {
+
+
 
             if($scope.resource_event.result[i].user.value == selected.sys_id) {
 
                 $scope.startDate = $filter('date')($scope.resource_event.result[i].start_date_time, 'MM/dd/yyyy h:mm a');
                 $scope.startTime = $filter('date')($scope.resource_event.result[i].start_date_time, 'h:mm');
                 $scope.endDate = $filter('date')($scope.resource_event.result[i].end_date_time, 'MM/dd/yyyy');
+                $scope.endDate1 = $filter('date')($scope.resource_event.result[i].end_date_time, 'MM/dd/yyyy h:mm a');
                 $scope.endTime = $filter('date')($scope.resource_event.result[i].end_date_time, 'h:mm');
+
+                $scope.startDate2 = $filter('date')($scope.resource_event.result[i].start_date_time, 'yyyy-MM-ddTHH:mm:ss');
+                $scope.endDate2 = $filter('date')($scope.resource_event.result[i].end_date_time, 'yyyy-MM-ddTHH:mm:ss');
+
                 $scope.events.push({
                     title: $scope.resource_event.result[i].type,
                     start:  $scope.startDate,
+                    end: $scope.endDate1
 
                 });
 
+                if(typeof $scope.user[selected.sys_id][$scope.endDate] != 'undefined') {
+                    if(typeof $scope.user[selected.sys_id][$scope.endDate].days != 'undefined') {
+                        $scope.user[selected.sys_id][$scope.endDate].days.push($scope.startDate2, $scope.endDate2);
+                    }
+                    else {
+                        $scope.user[selected.sys_id][$scope.endDate].days = [];
+                        $scope.user[selected.sys_id][$scope.endDate].days.push($scope.startDate2, $scope.endDate2);
+                    }
+                }
+                else {
+                    $scope.user[selected.sys_id][$scope.endDate] = {};
+                    $scope.user[selected.sys_id][$scope.endDate].days = [];
+                    $scope.user[selected.sys_id][$scope.endDate].days.push($scope.startDate2, $scope.endDate2);
 
+                }
             }
+
         }
 
+        /* calculating busy time for each member */
+        
+        $scope.total = 0;
+        angular.forEach($scope.user[selected.sys_id], function(value, key) {
+            console.log("for each");
+            console.log($scope.user[selected.sys_id][key].days);
+            var end = moment($scope.user[selected.sys_id][key].days[1]);
+            var start = moment($scope.user[selected.sys_id][key].days[0]);
+            console.log(end.diff(start, 'minutes'))
+            $scope.total = $scope.total + end.diff(start, 'minutes');
 
+        });
+
+
+
+        console.log($scope.user);
     };
 
 

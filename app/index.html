@@ -28,27 +28,20 @@
 <body ng-app = "myApp" ng-controller="CalController">
 
     <div>
-        <select ng-model="selectedUser" ng-options="x as x.name for x in users.result" ng-init="selectedUser=''" ng-change="currentUser(selectedUser);addTask(selectedUser)">
+        <select ng-model="selectedUser" ng-options="x as x.name for x in users.result" ng-init="selectedUser=''" ng-change="currentUser(selectedUser);populate();addTask(selectedUser)">
 
         </select>
 
+        <br/>
+        <br/>
         <div>
-            {{display.name}} <br/>
-            {{display.user_name}} <br/>
-            {{display.sys_id}}  <br/>
-            {{startDate}} <br/>
-            {{startTime}} <br/>
-            {{endDate}} <br/>
-            {{endTime}} <br/>
-
+            <div  ui-calendar="uiConfig.calendar" ng-model="eventSources" > </div>
         </div>
+
         <div >
-            <div  ui-calendar="uiConfig.calendar" ng-model="eventSources" >
-
-            </div>
+            {{user}}
+             {{total/60}}
         </div>
-
-
     </div>
 
 </body>
