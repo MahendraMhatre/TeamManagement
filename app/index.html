@@ -28,7 +28,7 @@
 <body ng-app = "myApp" ng-controller="CalController">
 
     <div>
-        <select ng-model="selectedUser" ng-options="x as x.name for x in users.result" ng-init="selectedUser=''" ng-change="currentUser(selectedUser);populate();addTask(selectedUser)">
+        <select ng-model="selectedUser" ng-options="x as x.name for x in users.result" ng-init="selectedUser=''" ng-change="currentUser(selectedUser);addTask(selectedUser);repeatingTask()">
 
         </select>
 
@@ -38,9 +38,12 @@
             <div  ui-calendar="uiConfig.calendar" ng-model="eventSources" > </div>
         </div>
 
-        <div >
-            {{user}}
-             {{total/60}}
+        <div ng-show = "selectedUser" >
+
+            Total Busy Hours: {{total/60}} <br/>
+            Total Free Hours: {{40 - (total)/60}}
+
+            {{freeHrsDate[selectedUser.sys_id]}}
         </div>
     </div>
 

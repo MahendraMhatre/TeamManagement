@@ -9,7 +9,8 @@ var app = angular.module('myApp', ['ui.calendar']);
 app.controller('CalController', function($scope, $http, $filter) {
     /* config object */
 
-
+    $scope.freeHrsDate = {};
+    $scope.displayTime;
     $http.get('users.json').success(function(data) {
         $scope.users = data;
 
@@ -28,8 +29,7 @@ app.controller('CalController', function($scope, $http, $filter) {
 
 
     /* event source that contains custom events on the scope */
-    $scope.events = [
-           ];
+    $scope.events = [];
 
     $scope.uiConfig = {
         calendar:{
@@ -73,20 +73,15 @@ app.controller('CalController', function($scope, $http, $filter) {
 
     /* event sources array*/
 
-
-
-
     $scope.eventSources = [$scope.events];
 
     $scope.user = {};
 
 
     $scope.addTask = function(selected) {
-        console.log("in change");
-        console.log(selected);
 
-
-        $scope.user[selected.sys_id] = {}
+        $scope.user[selected.sys_id] = {};
+        $scope.freeHrsDate[selected.sys_id] = {};
         $scope.events.splice(0,$scope.events.length);
         for(var i = 0; i < $scope.resource_event.result.length ; i++) {
 
@@ -130,21 +125,114 @@ app.controller('CalController', function($scope, $http, $filter) {
         }
 
         /* calculating busy time for each member */
-        
+
         $scope.total = 0;
+
+        $scope.freeHrs = [];
+
+
+        $scope.calculateFreeHrs = function(d1, week , d2) {
+
+
+            // var d3 = d2 +'T12:00:00';
+
+            var d4 = d2 +'T12:00:00';
+            console.log("calculte free hrs");
+            console.log(moment(d1));
+            console.log(d2);
+            console.log(week);
+
+            var start = moment(d1);
+
+            var tempStart = d1;
+            // make a fixed moment for last end time of the day;
+            var fixedEnd = moment(d4);
+
+
+
+            for(var i = 0; i < week.length; i += 2) {
+
+                var end = moment(week[i]);
+                if(start.hour() >= 12) {
+                    start = moment(week[i + 1]);
+                    break;
+                }
+                if(end.hour() > 12) {
+                    break;
+                }
+
+                if(end.diff(start, 'minutes') > 0) {
+                    $scope.freeHrs.push(start, end);
+                    $scope.freeHrsDate[selected.sys_id][d2].push(tempStart, week[i]);
+                }
+                tempStart = week[i + 1];
+                start = moment(week[i + 1]);
+            }
+
+            end = fixedEnd;
+            if(end.diff(start, 'minutes') > 0) {
+                $scope.freeHrs.push(start, end);
+                $scope.freeHrsDate[selected.sys_id][d2].push(tempStart, d4);
+            }
+
+
+        };
+
+
+        var start;
+        var end;
         angular.forEach($scope.user[selected.sys_id], function(value, key) {
             console.log("for each");
             console.log($scope.user[selected.sys_id][key].days);
-            var end = moment($scope.user[selected.sys_id][key].days[1]);
-            var start = moment($scope.user[selected.sys_id][key].days[0]);
-            console.log(end.diff(start, 'minutes'))
-            $scope.total = $scope.total + end.diff(start, 'minutes');
+            $scope.demoDate = $filter('date')($scope.user[selected.sys_id][key].days[0], 'yyyy-MM-dd');
+            $scope.demoDate1 = $filter('date')($scope.user[selected.sys_id][key].days[0], 'yyyy-MM-dd');
+            $scope.demo = $scope.demoDate1;
+            $scope.freeHrsDate[selected.sys_id][$scope.demoDate] = [];
+            $scope.demoDate = $scope.demoDate + 'T08:00:00';
+
+            console.log("Demo Date");
+            console.log($scope.demoDate);
+           /*considering the days array as sorted */
+            $scope.user[selected.sys_id][key].days.sort(function(a,b){
+                end = moment(a);
+                start = moment(b);
+                return end.diff(start, 'minutes');
+            });
+
+            console.log("sorted hours");
+            console.log($scope.user[selected.sys_id][key].days);
+
+            $scope.calculateFreeHrs($scope.demoDate, $scope.user[selected.sys_id][key].days, $scope.demoDate1);
+            for(var i = 0; i < $scope.user[selected.sys_id][key].days.length - 1 ; i =i+2) {
+                end = moment($scope.user[selected.sys_id][key].days[i+1]);
+                start = moment($scope.user[selected.sys_id][key].days[i]);
+                console.log(end.diff(start, 'minutes'));
+                $scope.total = $scope.total + end.diff(start, 'minutes');
+           }
+
+            console.log("Free hours");
+            console.log($scope.freeHrs);
+            console.log("free hrs date");
+            console.log($scope.freeHrsDate);
+
 
         });
 
 
 
-        console.log($scope.user);
+
+    };
+
+    $scope.repeatingTask = function() {
+        console.log("in repeating tasks");
+        angular.forEach($scope.freeHrsDate, function(value, key) {
+            angular.forEach($scope.freeHrsDate[key], function(value1, index) {
+                console.log($scope.freeHrsDate[key]);
+                var times = value1;
+
+            });
+
+        });
     };
 
 
