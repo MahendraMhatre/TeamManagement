@@ -6,12 +6,15 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>My AngularJS App</title>
+  <title>Team Management</title>
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="app.css">
 
     <link rel="stylesheet" href="bower_components/fullcalendar/dist/fullcalendar.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <!-- jquery, moment, and angular have to get included before fullcalendar -->
     <script type="text/javascript" src="bower_components/jquery/dist/jquery.min.js"></script>
     <script type="text/javascript" src="bower_components/moment/min/moment.min.js"></script>
@@ -22,34 +25,71 @@
     <script type="text/javascript" src="bower_components/angular-bootstrap/ui-bootstrap.js"></script>
     <script type="text/javascript" src="bower_components/angular-bootstrap/ui-bootstrap.min.js"></script>
 
-  <script src="app1.js"></script>
+  <script src="app.js"></script>
 </head>
 
 <body ng-app = "myApp" ng-controller="CalController">
 
     <div>
-        <!--<select ng-model="selectedUser" ng-options="x as x.name for x in users.result" ng-init="selectedUser=''" ng-change="currentUser(selectedUser);addTask(selectedUser);repeatingTask()">-->
+        <h3> Select the User from the drop down below:</h3>
 
-        <!--</select>-->
+        <select ng-model="selectedUser" ng-options="x as x.name for x in users.result" ng-init="selectedUser=''" ng-change="addTask(selectedUser);">
 
-        <select ng-model="selectedUser" ng-options="x as x.name for x in users.result" ng-init="selectedUser=''" ng-change="calculateHrs();calculateTaskWork();calculateRelativeWork();calculateMeetingWork()">
+        </select> <br/> <br/>
 
-            </select>
-        <br/>
-        <br/>
         <div>
             <div  ui-calendar="uiConfig.calendar" ng-model="eventSources" > </div>
         </div>
 
-        <div >
+        <div class="container-fluid">
+            <div class="row">
 
-            Total Busy Hours: {{total/60}} <br/>
-            Total Free Hours: {{40 - (total)/60}}
+                <div class="col-sm-4">
+                    <h3> Hours Busy</h3>
 
-            {{freeHrsDate}}
+                    <div  ng-repeat="(key, value) in hours">
+                         <p>  {{key}} :: {{value}} </p>
+                    </div>
+
+                </div>
+
+                <div class="col-sm-4">
+                    <h3>Hours Free</h3>
+
+                    <div  ng-repeat="(key, value) in hours">
+                        <p>  {{key}} :: {{40 - value}} </p>
+                    </div>
+                </div>
+
+                <div class="col-sm-4">
+                    <h3>Users Available for Recurring Tasks </h3>
+
+                    <div ng-repeat="(key, value) in freeUsers">
+                        <p ng-if = "value == 1"> {{key}} </p>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4">
+                <h3> Number of hours user Busy with Tasks</h3>
+
+                <div ng-repeat="(key, value) in tasks|orderBy:value">
+                    <p> {{value.name}} :: {{value.value}} </p>
+                </div>
+            </div>
+                <div class="col-sm-4">
+                    <h3> Number of hours user Busy with Meeting</h3>
+                    <div ng-repeat="(key, value) in meeting| orderBy:value ">
+                        <p> {{value.name}} :: {{value.value}}</p>
+                    </div>
+                </div>
+            </div>
 
         </div>
-    </div>
+
 
 </body>
 </html>
