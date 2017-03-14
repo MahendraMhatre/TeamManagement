@@ -22,28 +22,32 @@
     <script type="text/javascript" src="bower_components/angular-bootstrap/ui-bootstrap.js"></script>
     <script type="text/javascript" src="bower_components/angular-bootstrap/ui-bootstrap.min.js"></script>
 
-  <script src="app.js"></script>
+  <script src="app1.js"></script>
 </head>
 
 <body ng-app = "myApp" ng-controller="CalController">
 
     <div>
-        <select ng-model="selectedUser" ng-options="x as x.name for x in users.result" ng-init="selectedUser=''" ng-change="currentUser(selectedUser);addTask(selectedUser);repeatingTask()">
+        <!--<select ng-model="selectedUser" ng-options="x as x.name for x in users.result" ng-init="selectedUser=''" ng-change="currentUser(selectedUser);addTask(selectedUser);repeatingTask()">-->
 
-        </select>
+        <!--</select>-->
 
+        <select ng-model="selectedUser" ng-options="x as x.name for x in users.result" ng-init="selectedUser=''" ng-change="calculateHrs();calculateTaskWork();calculateRelativeWork();calculateMeetingWork()">
+
+            </select>
         <br/>
         <br/>
         <div>
             <div  ui-calendar="uiConfig.calendar" ng-model="eventSources" > </div>
         </div>
 
-        <div ng-show = "selectedUser" >
+        <div >
 
             Total Busy Hours: {{total/60}} <br/>
             Total Free Hours: {{40 - (total)/60}}
 
-            {{freeHrsDate[selectedUser.sys_id]}}
+            {{freeHrsDate}}
+
         </div>
     </div>
 

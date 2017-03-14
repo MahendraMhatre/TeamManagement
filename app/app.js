@@ -235,5 +235,6 @@ app.controller('CalController', function($scope, $http, $filter) {
         });
     };
 
+    console.log($scope.user);
 
 });
